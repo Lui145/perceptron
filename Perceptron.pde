@@ -2,7 +2,7 @@ Punto[] puntos = new Punto[1000];
 Neurona perceptron;
 
 float m = 0.5, b = 0, tam;
-int puntosErroneos, margenError = 3;
+int puntosErroneos, margenError = 5, it = 0;
 
 void setup(){
   size(800,800);
@@ -17,6 +17,7 @@ void setup(){
 }
 
 void draw(){
+  it++;
   background(200);
   ejes();
   strokeWeight(1);
@@ -26,29 +27,26 @@ void draw(){
 
   
   for(int i = 0; i<puntos.length; i++){
-    puntos[i].x = random(0,width)-width/2;
-    puntos[i].y = random(0,height)-height/2;  
+    Punto p = puntos[i];
+    p.x = random(0,width)-width/2;
+    p.y = random(0,height)-height/2;
+    p.tipo = int(perceptron.clasificar(p.x/tam, p.y/tam));
+    if(puntoErroneo(p))
+      puntosErroneos++;
+      
+    p.pintar();
   }
   
-  for(Punto punto: puntos){
-    punto.tipo = int(perceptron.clasificar(punto.x/tam, punto.y/tam));
-    
-    if(puntoErroneo(punto)){
-      puntosErroneos++;
-    }
-      
-    punto.pintar();
-  }
-  println(puntosErroneos);
-  if(puntosErroneos<margenError)
+  if(puntosErroneos<margenError){
+    println("iteraciones: " + it + "\n" + 
+            "puntos erroneos: " + puntosErroneos + "\n" +
+            "tiempo: " + millis()/1000 + " segundos");
     noLoop();
+  }
   
   float x = random(0,width)-width/2;
   float y = random(0,height)-height/2;
-  perceptron.entrenamiento(x, y, y<m*x+b? 1 : -1);
-  
-  //delay(10);
-  
+  perceptron.entrenamiento(x, y, y<m*x+b? 1 : -1);  
 }
 
 void ejes(){
